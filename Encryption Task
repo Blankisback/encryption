@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Encryption</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        #container {
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            padding: 20px;
+            width: 400px;
+            margin: 0 auto;
+            background-color: #f5f5f5;
+        }
+
+        label, textarea, input, button {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        button {
+            background-color: #007BFF;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        p {
+            margin-top: 10px;
+        }
+
+        body  {
+            background-image: url("another.jpeg");
+            background-size: cover;
+            background-repeat: no-repeat;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <h1>Encryption and Decryption</h1>
+
+        <label for="message">Enter a message:</label>
+        <textarea id="message" rows="4" cols="50"></textarea>
+        <br>
+        <label for="caesarOffset">Caesar Cipher Offset:</label>
+        <input type="number" id="caesarOffset" min="0">
+        <br>
+        <label for="keyword">Keyword (for Keyword Cipher):</label>
+        <input type="text" id="keyword">
+        <br>
+        <button onclick="encryptMessage()">Encrypt</button>
+        <button onclick="decryptMessage()">Decrypt</button>
+        <br>
+        <p><strong>Caesar Cipher:</strong></p>
+        <p><strong>Encrypted Message:</strong></p>
+        <p id="caesarEncryptedMessage"></p>
+        <p><strong>Decrypted Message:</strong></p>
+        <p id="caesarDecryptedMessage"></p>
+        <br>
+        <p><strong>Keyword Cipher:</strong></p>
+        <p><strong>Encrypted Message:</strong></p>
+        <p id="keywordEncryptedMessage"></p>
+        <p><strong>Decrypted Message:</strong></p>
+        <p id="keywordDecryptedMessage"></p>
+    </div>
+
+    <script>
+        // Function to perform Caesar Cipher encryption
+        function caesarCipher(message, offset) {
+            let result = "";
+            for (let i = 0; i < message.length; i++) {
+                const char = message[i];
+                if (char.match(/[a-z]/i)) {
+                    const isUpperCase = char === char.toUpperCase();
+                    const charCode = char.charCodeAt(0);
+                    const shiftedCharCode = isUpperCase
+                        ? ((charCode - 65 + offset) % 26) + 65
+                        : ((charCode - 97 + offset) % 26) + 97;
+                    result += String.fromCharCode(shiftedCharCode);
+                } else {
+                    result += char;
+                }
+            }
+            return result;
+        }
+
+        // Function to perform Caesar Cipher decryption
+        function caesarDecipher(encryptedMessage, offset) {
+            return caesarCipher(encryptedMessage, 26 - (offset % 26));
+        }
+
+        // Function to perform Keyword Cipher encryption
+        function keywordCipher(message, keyword) {
+            let result = "";
+            const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            const upperMessage = message.toUpperCase();
+            const keywordRepeated = keyword.toUpperCase().repeat(Math.ceil(message.length / keyword.length));
+
+            for (let i = 0; i < message.length; i++) {
+                const char = upperMessage[i];
+                const keywordChar = keywordRepeated[i];
+                if (char.match(/[A-Z]/i)) {
+                    const charCode = char.charCodeAt(0);
+                    const keywordCode = keywordChar.charCodeAt(0) - 65;
+                    const shiftedCharCode = (charCode + keywordCode) % 26 + 65;
+                    result += message[i] === message[i].toUpperCase() ? String.fromCharCode(shiftedCharCode) : String.fromCharCode(shiftedCharCode).toLowerCase();
+                } else {
+                    result += message[i];
+                }
+            }
+            return result;
+        }
+
+        // Function to perform Keyword Cipher decryption
+        function keywordDecipher(encryptedMessage, keyword) {
+            let result = "";
+            const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            const upperMessage = encryptedMessage.toUpperCase();
+            const keywordRepeated = keyword.toUpperCase().repeat(Math.ceil(encryptedMessage.length / keyword.length));
+
+            for (let i = 0; i < encryptedMessage.length; i++) {
+                const char = upperMessage[i];
+                const keywordChar = keywordRepeated[i];
+                if (char.match(/[A-Z]/i)) {
+                    const charCode = char.charCodeAt(0);
+                    const keywordCode = keywordChar.charCodeAt(0) - 65;
+                    const shiftedCharCode = (charCode - keywordCode + 26) % 26 + 65;
+                    result += encryptedMessage[i] === encryptedMessage[i].toUpperCase() ? String.fromCharCode(shiftedCharCode) : String.fromCharCode(shiftedCharCode).toLowerCase();
+                } else {
+                    result += encryptedMessage[i];
+                }
+            }
+            return result;
+        }
+
+        // Function to encrypt the message
+        function encryptMessage() {
+            const message = document.getElementById("message").value;
+            const caesarOffset = parseInt(document.getElementById("caesarOffset").value) || 0;
+            const keyword = document.getElementById("keyword").value;
+
+            // Encrypt using Caesar Cipher
+            const caesarEncrypted = caesarCipher(message, caesarOffset);
+
+            // Encrypt using Keyword Cipher
+            const keywordEncrypted = keywordCipher(message, keyword);
+
+            // Display the results separately
+            document.getElementById("caesarEncryptedMessage").textContent = `Encrypted: ${caesarEncrypted}`;
+            document.getElementById("keywordEncryptedMessage").textContent = `Encrypted: ${keywordEncrypted}`;
+        }
+
+        // Function to decrypt the message
+        function decryptMessage() {
+            const message = document.getElementById("message").value;
+            const caesarOffset = parseInt(document.getElementById("caesarOffset").value) || 0;
+            const keyword = document.getElementById("keyword").value;
+
+            // Decrypt using Caesar Cipher
+            const caesarDecrypted = caesarDecipher(message, caesarOffset);
+
+            // Decrypt using Keyword Cipher
+            const keywordDecrypted = keywordDecipher(message, keyword);
+
+            // Display the results separately
+            document.getElementById("caesarDecryptedMessage").textContent = `Decrypted: ${caesarDecrypted}`;
+            document.getElementById("keywordDecryptedMessage").textContent = `Decrypted: ${keywordDecrypted}`;
+        }
+    </script>
+</body>
+</html>
